@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useAutoReloadOnCredits } from './hooks/useAutoReloadOnCredits';
+import { FolhaPagamentoModulo } from './components/folha/FolhaPagamentoModulo';
 
-type Tab = 'dashboard' | 'bandas' | 'agendas' | 'produtores' | 'configuracoes';
+type Tab = 'dashboard' | 'bandas' | 'agendas' | 'produtores' | 'folha' | 'configuracoes';
 
 // Menu oficial de navegação do projeto (Mural removido definitivamente)
 const MENU_ITEMS: { id: Tab; label: string; icon: string }[] = [
@@ -9,6 +10,7 @@ const MENU_ITEMS: { id: Tab; label: string; icon: string }[] = [
   { id: 'bandas', label: 'Bandas', icon: '🎸' },
   { id: 'agendas', label: 'Agendas & Shows', icon: '📅' },
   { id: 'produtores', label: 'Controle de Produtores', icon: '👥' },
+  { id: 'folha', label: 'Folha de Pagamento', icon: '💼' },
   { id: 'configuracoes', label: 'Configurações', icon: '⚙️' }
 ];
 
@@ -155,6 +157,18 @@ export const App: React.FC = () => {
                 <span style={{ color: '#94a3b8', fontSize: '13px' }}>Produtores Vinculados</span>
                 <p style={{ fontSize: '28px', fontWeight: 700, color: '#facc15', margin: '8px 0 0 0' }}>--</p>
               </div>
+
+              <div 
+                onClick={() => setAbaAtiva('folha')}
+                style={{ backgroundColor: '#0f172a', border: '1px solid #0284c7', borderRadius: '10px', padding: '20px', cursor: 'pointer', transition: 'transform 0.2s' }}
+                title="Acessar módulo de Folha de Pagamento"
+              >
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <span style={{ color: '#38bdf8', fontSize: '13px', fontWeight: 600 }}>Folha de Pagamento</span>
+                  <span style={{ fontSize: '12px', color: '#94a3b8' }}>Acessar →</span>
+                </div>
+                <p style={{ fontSize: '24px', fontWeight: 700, color: '#4ade80', margin: '8px 0 0 0' }}>Gestão Ativa</p>
+              </div>
             </div>
           </div>
         )}
@@ -178,6 +192,10 @@ export const App: React.FC = () => {
             <h2 style={{ fontSize: '22px', fontWeight: 700, marginBottom: '8px' }}>Controle de Produtores</h2>
             <p style={{ color: '#94a3b8', fontSize: '14px' }}>Gerenciamento de vínculos entre usuários e bandas autorizadas.</p>
           </div>
+        )}
+
+        {abaAtiva === 'folha' && (
+          <FolhaPagamentoModulo />
         )}
 
         {abaAtiva === 'configuracoes' && (
