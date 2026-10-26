@@ -15,16 +15,37 @@ const MENU_ITEMS: { id: Tab; label: string; icon: string }[] = [
 ];
 
 export const App: React.FC = () => {
-  const [abaAtiva, setAbaAtiva] = useState<Tab>('dashboard');
+  const [abaAtiva, setAbaAtiva] = useState<Tab>(() => {
+    if (typeof window !== 'undefined') {
+      const hash = window.location.hash.toLowerCase().replace('#', '');
+      if (hash === 'folha' || hash === 'folha-pagamento') return 'folha';
+      if (hash && MENU_ITEMS.some(item => item.id === hash)) return hash as Tab;
+    }
+    return 'folha';
+  });
   const { credits, hasCredits, triggerReload } = useAutoReloadOnCredits();
 
-  // Limpeza de qualquer referência legada de rota/hash para mural
-  useEffect(() => {
-    const hash = window.location.hash.toLowerCase();
-    if (hash.includes('mural')) {
-      window.history.replaceState(null, '', window.location.pathname);
-      setAbaAtiva('dashboard');
+  const mudarAba = (novaAba: Tab) => {
+    setAbaAtiva(novaAba);
+    if (typeof window !== 'undefined') {
+      window.location.hash = novaAba;
     }
+  };
+
+  // Sincronização de rota por hash e limpeza de referência legada de mural
+  useEffect(() => {
+    const handleHashChange = () => {
+      const hash = window.location.hash.toLowerCase().replace('#', '');
+      if (hash.includes('mural')) {
+        window.history.replaceState(null, '', window.location.pathname);
+        setAbaAtiva('folha');
+      } else if (hash && MENU_ITEMS.some(item => item.id === hash)) {
+        setAbaAtiva(hash as Tab);
+      }
+    };
+
+    window.addEventListener('hashchange', handleHashChange);
+    return () => window.removeEventListener('hashchange', handleHashChange);
   }, []);
 
   return (
@@ -59,13 +80,13 @@ export const App: React.FC = () => {
         </div>
 
         {/* Itens do Menu — sem o mural */}
-        <nav style={{ display: 'flex', gap: '8px' }}>
+        <nav style={{ display: 'flex', gap: '8px', overflowX: 'auto', maxWidth: '100%', scrollbarWidth: 'none' }}>
           {MENU_ITEMS.map((item) => {
             const isActive = abaAtiva === item.id;
             return (
               <button
                 key={item.id}
-                onClick={() => setAbaAtiva(item.id)}
+                onClick={() => mudarAba(item.id)}
                 style={{
                   display: 'flex',
                   alignItems: 'center',
@@ -78,7 +99,8 @@ export const App: React.FC = () => {
                   cursor: 'pointer',
                   backgroundColor: isActive ? '#0284c7' : 'transparent',
                   color: isActive ? '#ffffff' : '#94a3b8',
-                  transition: 'all 0.2s ease'
+                  transition: 'all 0.2s ease',
+                  whiteSpace: 'nowrap'
                 }}
               >
                 <span>{item.icon}</span>
@@ -159,7 +181,7 @@ export const App: React.FC = () => {
               </div>
 
               <div 
-                onClick={() => setAbaAtiva('folha')}
+                onClick={() => mudarAba('folha')}
                 style={{ backgroundColor: '#0f172a', border: '1px solid #0284c7', borderRadius: '10px', padding: '20px', cursor: 'pointer', transition: 'transform 0.2s' }}
                 title="Acessar módulo de Folha de Pagamento"
               >
