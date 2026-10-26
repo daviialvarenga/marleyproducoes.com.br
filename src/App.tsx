@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useAutoReloadOnCredits } from './hooks/useAutoReloadOnCredits';
 import { FolhaPagamentoModulo } from './components/folha/FolhaPagamentoModulo';
+import { GestaoVinculosBanda } from './components/GestaoVinculosBanda';
+import { bandasAccessStorage } from './services/bandasAccessStorage';
 
 type Tab = 'dashboard' | 'bandas' | 'agendas' | 'produtores' | 'folha' | 'configuracoes';
 
@@ -15,6 +17,7 @@ const MENU_ITEMS: { id: Tab; label: string; icon: string }[] = [
 ];
 
 export const App: React.FC = () => {
+  const [usuarioAtualId, setUsuarioAtualId] = useState('admin');
   const [abaAtiva, setAbaAtiva] = useState<Tab>(() => {
     if (typeof window !== 'undefined') {
       const hash = window.location.hash.toLowerCase().replace('#', '');
@@ -224,6 +227,10 @@ export const App: React.FC = () => {
           <div>
             <h2 style={{ fontSize: '22px', fontWeight: 700, marginBottom: '8px' }}>Bandas</h2>
             <p style={{ color: '#94a3b8', fontSize: '14px' }}>Catálogo e gerenciamento de bandas sob controle de acesso.</p>
+            <ul style={{ color: '#f8fafc', fontSize: '14px', marginTop: '12px' }}>
+              {bandasAccessStorage.getBandasAutorizadas(usuarioAtualId).map((b) => <li key={b.id}>{b.nome}</li>)}
+            </ul>
+            {bandasAccessStorage.getBandasAutorizadas(usuarioAtualId).length === 0 && <div style={{ color: '#facc15', fontSize: '14px' }}>Nenhuma banda autorizada.</div>}
           </div>
         )}
 
@@ -231,6 +238,13 @@ export const App: React.FC = () => {
           <div>
             <h2 style={{ fontSize: '22px', fontWeight: 700, marginBottom: '8px' }}>Agendas & Shows</h2>
             <p style={{ color: '#94a3b8', fontSize: '14px' }}>Cronograma de eventos filtrado pelas bandas autorizadas do usuário.</p>
+            {bandasAccessStorage.getBandasAutorizadas(usuarioAtualId).length === 0 ? (
+              <div style={{ color: '#facc15', fontSize: '14px', marginTop: '12px' }}>Nenhuma banda vinculada ao seu usuário. Nenhuma agenda disponível.</div>
+            ) : (
+              <ul style={{ color: '#f8fafc', fontSize: '14px', marginTop: '12px' }}>
+                {bandasAccessStorage.getBandasAutorizadas(usuarioAtualId).map((b) => <li key={b.id}>{b.nome}</li>)}
+              </ul>
+            )}
           </div>
         )}
 
@@ -238,6 +252,16 @@ export const App: React.FC = () => {
           <div>
             <h2 style={{ fontSize: '22px', fontWeight: 700, marginBottom: '8px' }}>Controle de Produtores</h2>
             <p style={{ color: '#94a3b8', fontSize: '14px' }}>Gerenciamento de vínculos entre usuários e bandas autorizadas.</p>
+            <div style={{ marginBottom: '12px' }}>
+              <label style={{ color: '#94a3b8', fontSize: '13px', marginRight: '8px' }}>Usuário atual:</label>
+              <select value={usuarioAtualId} onChange={(e) => setUsuarioAtualId(e.target.value)} style={{ padding: '6px', borderRadius: '6px', backgroundColor: '#1e293b', color: '#f8fafc', border: '1px solid #334155' }}>
+                {bandasAccessStorage.getUsuarios().map((u) => <option key={u.id} value={u.id}>{u.nome} ({u.role})</option>)}
+              </select>
+            </div>
+            <GestaoVinculosBanda usuarioAtualId={usuarioAtualId} />
+            <div style={{ marginTop: '16px', color: '#94a3b8', fontSize: '13px' }}>
+              Bandas autorizadas: {bandasAccessStorage.getBandasAutorizadas(usuarioAtualId).map((b) => b.nome).join(', ') || 'Nenhuma'}
+            </div>
           </div>
         )}
 
