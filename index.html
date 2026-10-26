@@ -6,6 +6,77 @@
     <title>Marley Produções</title>
     <!-- Sentinela de recuperação automática: previne tela em branco quando houver créditos -->
     <script src="/credit-auto-reload.js"></script>
+    <style>
+      /* Microinterações sutis — apenas transform e opacity, sem layout shift */
+      :root { --reveal-dur: 500ms; --hover-dur: 180ms; }
+
+      /* Entrada ao rolar */
+      .reveal {
+        opacity: 0;
+        transform: translateY(14px);
+        transition: opacity var(--reveal-dur) ease-out, transform var(--reveal-dur) ease-out;
+        will-change: opacity, transform;
+      }
+      .reveal.visible {
+        opacity: 1;
+        transform: translateY(0);
+      }
+
+      /* Botões — hover / foco / clique */
+      .btn {
+        transition: opacity var(--hover-dur) ease, transform var(--hover-dur) ease;
+      }
+      .btn:hover { opacity: 0.92; transform: scale(1.02); }
+      .btn:active { transform: scale(0.98); }
+      .btn:focus-visible { opacity: 1; transform: none; }
+
+      /* Botão principal — leve escala + brilho */
+      .btn-primary {
+        position: relative;
+        transition: opacity var(--hover-dur) ease, transform var(--hover-dur) ease;
+      }
+      .btn-primary:hover { opacity: 1; transform: scale(1.03); }
+      .btn-primary:active { transform: scale(0.97); }
+
+      /* Cards — elevação sutil */
+      .card {
+        transition: opacity 220ms ease, transform 220ms ease;
+      }
+      .card:hover { transform: translateY(-2px); opacity: 1; }
+
+      /* Links / itens clicáveis */
+      a, [role="link"] {
+        transition: opacity 150ms ease, transform 150ms ease;
+      }
+      a:hover, [role="link"]:hover { opacity: 0.9; transform: translateX(2px); }
+
+      /* Imagens — zoom sutil */
+      img { transition: transform 400ms ease; }
+      img:hover { transform: scale(1.03); }
+
+      /* Conteúdo que abre/fecha suavemente (menu, accordion) */
+      .collapse {
+        opacity: 0;
+        transform: translateY(-8px);
+        transition: opacity 220ms ease, transform 220ms ease;
+      }
+      .collapse.open { opacity: 1; transform: translateY(0); }
+
+      /* Respeita prefers-reduced-motion: anula animações */
+      @media (prefers-reduced-motion: reduce) {
+        .reveal, .reveal.visible {
+          opacity: 1 !important;
+          transform: none !important;
+          transition: none !important;
+        }
+        .btn, .btn-primary, .card, a, [role="link"], img, .collapse,
+        * { transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; }
+        .collapse.open { opacity: 1; transform: none; }
+        .btn:hover, .btn-primary:hover, .card:hover, a:hover, [role="link"]:hover, img:hover {
+          transform: none !important;
+        }
+      }
+    </style>
   </head>
   <body>
     <div id="root"></div>

@@ -48,6 +48,31 @@ export const App: React.FC = () => {
     return () => window.removeEventListener('hashchange', handleHashChange);
   }, []);
 
+  // Entrada ao rolar: revela seções, cards e títulos com fade + deslocamento leve
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('visible');
+            if (reduced) observer.unobserve(entry.target);
+          }
+        });
+      },
+      { threshold: 0.12, rootMargin: '0px 0px -10% 0px' }
+    );
+    document.querySelectorAll('.reveal:not(.visible)').forEach((el) => {
+      if (reduced) {
+        el.classList.add('visible');
+      } else {
+        observer.observe(el);
+      }
+    });
+    return () => observer.disconnect();
+  }, [abaAtiva]);
+
   return (
     <div style={{
       minHeight: '100vh',
@@ -84,7 +109,7 @@ export const App: React.FC = () => {
           {MENU_ITEMS.map((item) => {
             const isActive = abaAtiva === item.id;
             return (
-              <button
+              <button className="btn"
                 key={item.id}
                 onClick={() => mudarAba(item.id)}
                 style={{
@@ -149,9 +174,9 @@ export const App: React.FC = () => {
       {/* Conteúdo Principal conforme aba selecionada */}
       <main style={{ flex: 1, padding: '32px 24px', maxWidth: '1200px', width: '100%', margin: '0 auto', boxSizing: 'border-box' }}>
         {abaAtiva === 'dashboard' && (
-          <div>
+          <div className="reveal">
             <div style={{ marginBottom: '24px' }}>
-              <h2 style={{ fontSize: '22px', fontWeight: 700, margin: '0 0 6px 0', color: '#f8fafc' }}>
+              <h2 className="reveal" style={{ fontSize: '22px', fontWeight: 700, margin: '0 0 6px 0', color: '#f8fafc' }}>
                 Visão Geral
               </h2>
               <p style={{ margin: 0, color: '#94a3b8', fontSize: '14px' }}>
@@ -165,22 +190,22 @@ export const App: React.FC = () => {
               gap: '16px',
               marginBottom: '32px'
             }}>
-              <div style={{ backgroundColor: '#0f172a', border: '1px solid #1e293b', borderRadius: '10px', padding: '20px' }}>
+              <div className="card reveal" style={{ backgroundColor: '#0f172a', border: '1px solid #1e293b', borderRadius: '10px', padding: '20px' }}>
                 <span style={{ color: '#94a3b8', fontSize: '13px' }}>Bandas Ativas</span>
                 <p style={{ fontSize: '28px', fontWeight: 700, color: '#38bdf8', margin: '8px 0 0 0' }}>--</p>
               </div>
 
-              <div style={{ backgroundColor: '#0f172a', border: '1px solid #1e293b', borderRadius: '10px', padding: '20px' }}>
+              <div className="card reveal" style={{ backgroundColor: '#0f172a', border: '1px solid #1e293b', borderRadius: '10px', padding: '20px' }}>
                 <span style={{ color: '#94a3b8', fontSize: '13px' }}>Eventos na Agenda</span>
                 <p style={{ fontSize: '28px', fontWeight: 700, color: '#4ade80', margin: '8px 0 0 0' }}>--</p>
               </div>
 
-              <div style={{ backgroundColor: '#0f172a', border: '1px solid #1e293b', borderRadius: '10px', padding: '20px' }}>
+              <div className="card reveal" style={{ backgroundColor: '#0f172a', border: '1px solid #1e293b', borderRadius: '10px', padding: '20px' }}>
                 <span style={{ color: '#94a3b8', fontSize: '13px' }}>Produtores Vinculados</span>
                 <p style={{ fontSize: '28px', fontWeight: 700, color: '#facc15', margin: '8px 0 0 0' }}>--</p>
               </div>
 
-              <div 
+              <div className="card reveal" role="link" aria-label="Acessar módulo de Folha de Pagamento"
                 onClick={() => mudarAba('folha')}
                 style={{ backgroundColor: '#0f172a', border: '1px solid #0284c7', borderRadius: '10px', padding: '20px', cursor: 'pointer', transition: 'transform 0.2s' }}
                 title="Acessar módulo de Folha de Pagamento"
