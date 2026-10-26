@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useAutoReloadOnCredits } from './hooks/useAutoReloadOnCredits';
 import { FolhaPagamentoModulo } from './components/folha/FolhaPagamentoModulo';
 import { GestaoVinculosBanda } from './components/GestaoVinculosBanda';
+import { InstallPwaPrompt } from './components/InstallPwaPrompt';
 import { bandasAccessStorage } from './services/bandasAccessStorage';
 
 type Tab = 'dashboard' | 'bandas' | 'agendas' | 'produtores' | 'folha' | 'configuracoes';
@@ -276,6 +277,7 @@ export const App: React.FC = () => {
           </div>
         )}
       </main>
+      <InstallPwaPrompt />
     </div>
   );
 };
